@@ -114,6 +114,9 @@ class WebAPI(Resource):
         current_data = {'playerCount': len(data.clients.connectedClients), 'blocksCached': len(data.blocks.blockList),
                     'uniquePlayers': data.clients.dbManager.get_db_size(), 'upSince': upStart, 'peakPlayers': peakPlayers}
         request.setHeader("content-type", "application/json")
+        request.setHeader('Access-Control-Allow-Origin', '*')
+        request.setHeader('Access-Control-Allow-Methods', 'GET')
+        request.setHeader('Access-Control-Allow-Headers', 'x-prototype-version,x-requested-with')
         return json.dumps(current_data)
 
     def getChild(self, name, request):
