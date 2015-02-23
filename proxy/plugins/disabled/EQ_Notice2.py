@@ -50,7 +50,7 @@ def EQNotice(value):
     text = obj[0]["text"]
     global oldtext
     if(oldtext != text):
-        sysmessage = packetFactory.SystemMessagePacket("The upcoming Emergency Quests info has been updated!\nEnter !checkeq to redisplay upcoming Emergency Quests!", 0x0).build()
+        sysmessage = packetFactory.SystemMessagePacket("The upcoming Emergency Quests info has been updated! Enter !checkeq to redisplay upcoming Emergency Quests!", 0x0).build()
         message = packetFactory.SystemMessagePacket("{yel}%s" % text, 0x3).build()
         oldtext = text
         for client in data.clients.connectedClients.values():
