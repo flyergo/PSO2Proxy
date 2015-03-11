@@ -37,7 +37,7 @@ def LookupForEQ():
 
 def EQResponse(response):
     if response.code != 200:
-        logdebug("Invalid response code: {0}", response.code)
+        logdebug("Invalid response code: %d" % response.code)
         return
     d = readBody(response)
     d.addCallback(EQNotice)
