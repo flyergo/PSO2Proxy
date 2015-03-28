@@ -45,9 +45,10 @@ def EQResponse(response):
 def EQNotice(value):
     try:
         obj = json.loads(value)
+        text = obj[0]["text"]
     except Exception:
+        logdebug("Invalid Json: %s" % value)
         return
-    text = obj[0]["text"]
     global oldtext
     if(oldtext != text):
         sysmessage = packetFactory.SystemMessagePacket("The upcoming Emergency Quests info has been updated! Enter !checkeq to redisplay upcoming Emergency Quests!", 0x0).build()
