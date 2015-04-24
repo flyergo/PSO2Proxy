@@ -1,4 +1,7 @@
 # PSO2Proxy
+
+[![Build Status](https://travis-ci.org/flyergo/PSO2Proxy.svg?branch=master)](https://travis-ci.org/flyergo/PSO2Proxy)
+
 PSO2Proxy is a open source protocol proxy for the Japanese MMORPG, Phantasy Star Online 2 written in python. It allows the game's packet data to be unencrypted, logged, parsed and modified to both the client and server. It can also be used to connect to the game's servers if a client is blocked from normally connecting for any reason.
 
 ## Note
