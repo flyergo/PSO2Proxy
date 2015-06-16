@@ -12,7 +12,7 @@ from twisted.web.http_headers import Headers
 from commands import Command
 
 debug = 0
-url = 'http://pso2emq.flyergo.eu/emergencyQuest_v2.php'
+url = 'http://pso2emq.flyergo.eu/api/v2'
 interval = 60
 oldtext = ''
 
