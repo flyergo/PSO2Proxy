@@ -88,6 +88,7 @@ globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
                            'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!'}, True)
 
 blockNames = {}
+ShipLabel = {}
 
 proxy_ver = subprocess.Popen(["git", "describe", "--always"], stdout=subprocess.PIPE).communicate()[0].rstrip("\n")
 
@@ -101,13 +102,44 @@ def is_admin(sega_id):
 
 def load_block_names():
     global blockNames
-    if os.path.exists("cfg/blocknames.resources.json") and globalConfig.get_key('blockNameMode') == 1:
+    if globalConfig.get_key('blockNameMode') == 0:
+        return "[ShipProxy] Blocks are not renamed"
+    if os.path.exists("cfg/blocknames.resources.json"):
         f = open("cfg/blocknames.resources.json", 'r')
-        blockNames = json.load(f)
-        f.close()
-        print("[ShipProxy] %s Block names loaded!" % len(blockNames))
+        try:
+            blockNames = json.load(f)
+            f.close()
+            return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
+        except ValueError:
+            f.close()
+            return ("[ShipProxy] Failed to load blockname file")
+
+    else:
+        return "[ShipProxy] BlockName file does not exists"
 
 load_block_names()
+
+
+def load_ship_names():
+    global ShipLabel
+    ShipLabel.clear()  # Clear list
+
+    ShipLabel["Console"] = "Console"
+
+    if os.path.exists("cfg/shipslabel.resources.json"):
+        f = open("cfg/shipslabel.resources.json", 'r')
+        try:
+            for key, val in json.load(f).items():
+                ShipLabel[key] = val.encode("utf8", 'ignore')
+            f.close()
+            return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
+        except ValueError:
+            f.close()
+            return ("[GlobalChat] Failed to load ship  labels!")
+    else:
+        return "[GlobalChat] shipslabel file does not exists"
+
+load_ship_names()
 
 
 def load_bans():
@@ -120,7 +152,7 @@ def load_bans():
     bans = f.read()
     f.close()
     banList = json.loads(bans)
-    print("[Bans] %i bans loaded!" % len(bans))
+    return ("[Bans] %i bans loaded!" % len(bans))
 
 
 def save_bans():

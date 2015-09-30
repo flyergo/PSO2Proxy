@@ -1,14 +1,19 @@
 #!/usr/bin/python
-from twisted.internet import epollreactor
-epollreactor.install()
+try:
+    from twisted.internet import epollreactor
+    epollreactor.install()
+    from twisted.internet import reactor
+except ImportError:
+    from twisted.internet import reactor
 
+import codecs
 import commands
 import config
 from config import bindIp
 from config import myIpAddress as myIp
 
 import data
-
+import locale
 import os
 
 import plugins.plugins as plugin_manager
@@ -16,13 +21,13 @@ import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory
 from queryProtocols import ShipAdvertiserFactory
 
-
 import sys
+
+sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout, 'replace')
 
 import time
 import traceback
 from twisted.internet import endpoints
-from twisted.internet import reactor
 from twisted.internet import stdio
 from twisted.protocols import basic
 from twisted.python import log
@@ -113,12 +118,12 @@ def main():
 
     for plug in glob.glob("plugins/*.py"):
         plug = plug[:-3]
-        plug = plug.replace('/', '.')
+        plug = plug.replace(os.sep, '.')
         print("[ShipProxy] Importing %s..." % plug)
         __import__(plug)
     for f in plugin_manager.onStart:
         f()
-    reactor.suggestThreadPoolSize(30)  # We got 2 cores, screw it!
+    reactor.suggestThreadPoolSize(30)
     reactor.run()
     data.clients.dbManager.close_db()
     for f in plugin_manager.onStop:
