@@ -2,6 +2,7 @@ import blocks
 from config import bindIp
 from config import myIpAddress as myIp
 import io
+import packetFactory
 import socket
 import struct
 import sys
@@ -65,6 +66,10 @@ def get_first_block(ship_port, destination_ip):
         cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], (ship_port if (ship_port != 13000) else 12000), destination_ip)}
         print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
     return cachedBlocks[ship_port]['data']
+
+
+def reject_vita(my_ip_address):
+    return packetFactory.SystemMessagePacket("Vita systems are not supported on this proxy", 0x1).build()
 
 
 def get_ship_query(my_ip_address):
@@ -145,28 +150,28 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
         s.connect((ship_ip, ship_port))
     except socket.error as e:
         log.msg("[ShipQuery] Scraping %s:%i connnect return an error: %s" % (ship_ip, ship_port, e))
-        return None
+        return packetFactory.SystemMessagePacket("Proxy: Could not connect to game server", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i connect return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return None
+        return packetFactory.SystemMessagePacket("Proxy: Error connect to game server", 0x1).build()
     data = io.BytesIO()
     try:
         data.write(s.recv(4))
     except socket.error as e:
         log.msg("[ShipQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, e))
-        return None
+        return packetFactory.SystemMessagePacket("Proxy: game server dropped connection", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return None
+        return packetFactory.SystemMessagePacket("Proxy: game server dropped connection due to error", 0x1).build()
     actual_size = struct.unpack_from('i', data.getvalue(), 0x0)[0]
     try:
         data.write(s.recv(actual_size - 4))
     except socket.error as e:
         log.msg("[ShipQuery] Scraping %s:%i write return an error: %s" % (ship_ip, ship_port, e))
-        return None
+        return packetFactory.SystemMessagePacket("Proxy: game server dropped connection midway", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i wrtie return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return None
+        return packetFactory.SystemMessagePacket("Proxy: game server dropped connection midway due to error", 0x1).build()
     s.close()
     data.flush()
     data = bytearray(data.getvalue())
